@@ -31,21 +31,9 @@
 %%      already absolute, resolving "." and ".." path components in the
 %%      process.
 -spec abspath(list()) -> list().
-abspath([$/|_] = Path) ->
-    Parts = filename:split(Path),
-    abspath_resolve(Parts, "");
-abspath(Path = [C1, C2|_]) ->
-    if
-        %% Windows.
-        C1 >= $A andalso C1 =< $Z andalso C2 == $: ->
-            abspath_resolve(filename:split(Path), "");
-        true ->
-            {ok, Dir} = file:get_cwd(),
-            abspath(filename:join(Dir, Path))
-    end;
-abspath(Path = [_]) ->
-    {ok, Dir} = file:get_cwd(),
-    abspath(filename:join(Dir, Path)).
+abspath(Path) ->
+    abspath_resolve(filename:split(filename:absname(Path)), "").
+
 abspath_resolve([".."|Parts], [_Last|Acc]) ->
     abspath_resolve(Parts, Acc);
 abspath_resolve(["."|Parts], Acc) ->
